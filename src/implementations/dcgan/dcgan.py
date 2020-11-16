@@ -116,16 +116,6 @@ class DCGAN(ShannonJensen_GAN):
             self.generator.apply(weights_init_normal)
             self.discriminator.apply(weights_init_normal)
 
-    def _visualize(self, info, logger):
-        N = 16
-    
-        real = info.real[:N // 2]
-        logger.add('images', 'real-img', util.image_size_limiter(real))
-    
-        gen = info.gen[:N]
-        logger.add('images', 'gen-img', util.image_size_limiter(gen))
-
-
 @fig.Component('dcgan-raw')
 class DCGAN_Raw(misc.GAN_Like):
     
