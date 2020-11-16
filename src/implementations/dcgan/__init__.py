@@ -1,0 +1,1 @@
+from .dcgan import ShannonJensen_GAN, DCGAN

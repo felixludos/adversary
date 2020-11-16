@@ -1,0 +1,47 @@
+
+parents: [origin]
+
+device: cuda
+seed: 0
+num_workers: 0
+
+output:
+  save_freq: 5000
+
+  print_freq: 100
+  log_freq: 100
+  viz_freq: 500
+
+  tensorboard: true
+
+dataset:
+
+  name: mnist
+
+  labeled: False
+
+  device: cpu
+
+  batch_size: 128
+
+
+model:
+  _type: model
+
+  nonlin: elu
+
+  generator:
+    _type: model
+
+  discriminator:
+    _type: model
+
+#  optim_type: 'adam'
+#  lr: 5.e-4
+#  weight_decay: 0
+#  momentum: 0
+#  beta1: 0.9
+#  beta2: 0.999
+
+
+
