@@ -1,16 +1,18 @@
-
 _meta.script_name: train
 
-parents: [default/dcgan]
+parents: [default/wgan-gp]
+
+
+#model._model_type: gan
+
+
+
+
+
+###
+
 
 name: test-pycharm
 
 output.viz_freq: 200
-
-#model._model_type: dcgan-raw
-#model._model_type: wgan
-model._model_type: gan
-
-dataset.device: cuda
-
 inline: True

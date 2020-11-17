@@ -1,12 +1,5 @@
 
-parents: [base]
-
-latent_dim: 100
-
-training:
-  epochs: 200
-
-dataset.batch_size: 64
+parents: [default/_common]
 
 model:
   _model_type: dcgan
@@ -15,9 +8,6 @@ model:
   discriminator._model_type: dcgan-disc
 
   optim_type: adam
-  lr: 0.0002
-  beta1: 0.5
-  beta2: 0.999
 
 
 

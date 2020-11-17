@@ -1,0 +1,16 @@
+
+parents: [base]
+
+latent_dim: 100
+
+training.epochs: 200
+
+dataset.batch_size: 64
+
+model:
+
+  lr: 0.0002
+  beta1: 0.5
+  beta2: 0.999
+
+

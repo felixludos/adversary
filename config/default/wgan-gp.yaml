@@ -1,0 +1,13 @@
+
+parents: [default/wgan, default/_common]
+
+gp-wt: 10
+
+model:
+  _model_mod:
+    clamp-disc: _x_
+    grad-penalty: 0
+
+  optim_type: adam
+  lr: 0.0002
+

@@ -1,0 +1,19 @@
+
+parents: [default/_common]
+
+model:
+  _model_type: wgan
+  _model_mod:
+    skip-gen: 1
+    clamp-disc: 2
+
+  generator._model_type: wgan-gen
+  discriminator._model_type: wgan-disc
+
+  clip-value: 0.01
+  disc-steps: 5
+
+  optim_type: rmsprop
+  lr: 0.00005
+
+

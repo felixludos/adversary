@@ -25,8 +25,8 @@ def grad_penalty(disc, real, fake):  # for wgans
 	combo = eps * real.detach() + (1 - eps) * fake.detach()
 	combo.requires_grad = True
 	with torch.enable_grad():
-		grad, = autograd.grad(disc(combo).mean(), combo,
-							  create_graph=True, retain_graph=True, only_inputs=True)
+		grad = autograd.grad(disc(combo).mean(), combo,
+							  create_graph=True, retain_graph=True, only_inputs=True)[0]
 
 	return (grad.contiguous().view(B, -1).norm(2, dim=1) - 1).pow(2).mean()
 
