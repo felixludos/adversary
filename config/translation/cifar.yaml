@@ -1,0 +1,11 @@
+
+parents: [translation/_common]
+
+
+dataset:
+
+  dataset1.name: mnist
+
+  dataset2.name: cifar
+
+

@@ -1,0 +1,17 @@
+
+
+parents: [base]
+
+
+dataset:
+  _dataset_type: unpaired-translation
+
+  sel-first: True
+
+
+  dataset1:
+    _type: dataset
+
+
+  dataset2:
+    _type: dataset

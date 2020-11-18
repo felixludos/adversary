@@ -1,0 +1,50 @@
+
+
+parents: [translation/letters, default/_common]
+
+training.step_limit: 100000
+
+model:
+  _model_type: cycle-gan
+
+#  num-res-blocks: 9
+  num-res-blocks: 2
+
+  gen-AB:
+    _type: model
+    _model_type: cyclegan-gen
+    _model_mod.schedulable: 1
+
+  gen-BA:
+    _type: model
+    _model_type: cyclegan-gen
+    _model_mod.schedulable: 1
+
+  disc-A:
+    _type: model
+    _model_type: cyclegan-disc
+    _model_mod.schedulable: 1
+
+  disc-B:
+    _type: model
+    _model_type: cyclegan-disc
+    _model_mod.schedulable: 1
+
+
+  cycle-wt: 10.
+  ident-wt: 5.
+
+  buffer-A._type: cyclegan-buffer
+  buffer-B._type: cyclegan-buffer
+
+  optim_type: adam
+
+  scheduler_type: lambda
+  scheduler_freq: 500
+  scheduler_lambda:
+    _type: cyclegan-scheduler-lambda
+
+    n_epochs: 200
+    offset: 0
+    decay_start_epoch: 100
+
