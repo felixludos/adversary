@@ -1,6 +1,8 @@
 
 name: adversary
 
+py_info: adversary/_info.py
+
 src: startup.py
 
 

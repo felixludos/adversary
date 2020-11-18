@@ -1,0 +1,6 @@
+omnifig
+numpy
+matplotlib
+torch
+tensorflow
+foundation
