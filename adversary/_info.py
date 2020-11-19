@@ -5,7 +5,7 @@ long_name = 'adversary'
 version = '0.1'
 url = 'https://github.com/felixludos/adversary'
 
-description = 'Pytorch implementations of various GAN variants using foundation and omni-fig'
+description = 'Pytorch impl of various GAN variants using foundation and omni-fig'
 
 author = 'Felix Leeb'
 author_email = 'felixludos.info@gmail.com'
