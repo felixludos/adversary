@@ -1,7 +1,7 @@
 _meta.script_name: train
 
-#parents: [default/wgan-gp]
-parents: [translation/cifar, default/cycle-gan]
+parents: [default/wgan-gp]
+#parents: [translation/cifar, default/cycle-gan]
 
 
 #model._model_type: gan
