@@ -5,14 +5,10 @@ device: cuda
 seed: 0
 num_workers: 0
 
-output:
-  save_freq: 10000
-
-  print_freq: 100
-  log_freq: 100
-  viz_freq: 500
-
-  tensorboard: true
+checkpoint.freq: 10000
+print.freq: 100
+viz.freq: 500
+records.freq: 100
 
 dataset:
 
@@ -21,6 +17,8 @@ dataset:
   labeled: False
 
   batch_size: 128
+
+  split.val: 0.1666666
 
 
 model:
@@ -34,12 +32,5 @@ model:
   discriminator:
     _type: model
 
-#  optim_type: 'adam'
-#  lr: 5.e-4
-#  weight_decay: 0
-#  momentum: 0
-#  beta1: 0.9
-#  beta2: 0.999
-
-
+  optim._type: adam
 

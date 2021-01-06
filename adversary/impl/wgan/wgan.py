@@ -9,14 +9,16 @@ import omnifig as fig
 import foundation as fd
 from foundation import util
 
+from ...misc import GAN_Like
+
 @fig.Component('wgan-gen')
-class Generator(fd.Trainable_Model):
-	def __init__(self, A):
+class Generator(fd.Optimizable):
+	def __init__(self, A, **kwargs):
 		
-		latent_dim = A.pull('latent_dim', '<>din', 100)
+		latent_dim = A.pull('latent_dim', 100)
 		dout = A.pull('dout')
 		
-		super().__init__(latent_dim, dout)
+		super().__init__(A, din=latent_dim, dout=dout, **kwargs)
 
 		def block(in_feat, out_feat, normalize=True):
 			layers = [nn.Linear(in_feat, out_feat)]
@@ -41,12 +43,15 @@ class Generator(fd.Trainable_Model):
 
 
 @fig.Component('wgan-disc')
-class Discriminator(fd.Trainable_Model):
-	def __init__(self, A):
+class Discriminator(fd.Optimizable):
+	def __init__(self, A, din=None, dout=None, **kwargs):
 		
-		din = A.pull('din')
+		if din is None:
+			din = A.pull('din')
+		if dout is None:
+			dout = A.push('dout', 1, overwrite=False)
 	
-		super().__init__(din, 1)
+		super().__init__(A, din=din, dout=dout, **kwargs)
 
 		self.model = nn.Sequential(
 			nn.Linear(int(np.prod(din)), 512),
@@ -64,7 +69,7 @@ class Discriminator(fd.Trainable_Model):
 
 
 @fig.Component('wgan')
-class WGAN(fd.Generative, fd.Decodable, fd.Full_Model):
+class WGAN(fd.Decodable, GAN_Like):
 	def __init__(self, config, generator=None, discriminator=None, **other):
 		
 		if generator is None:
@@ -75,28 +80,25 @@ class WGAN(fd.Generative, fd.Decodable, fd.Full_Model):
 		viz_gen = config.pull('viz-gen', True)
 		viz_disc = config.pull('viz-disc', True)
 		viz_samples = config.pull('viz-samples', True)
+		
 		retain_graph = config.pull('retain-graph', False)
 		
-		if len(other):
-			super().__init__(config, **other)
-		else:
-			super().__init__(generator.din, generator.dout)
-		
-		if isinstance(generator, fd.Recordable):
-			self.stats.shallow_join(generator.stats)
-		if isinstance(discriminator, fd.Recordable):
-			self.stats.shallow_join(discriminator.stats)
+		super().__init__(config, din=generator.din, dout=generator.dout, **other)
 		
 		self.generator = generator
 		self.discriminator = discriminator
 		
 		self.latent_dim = self.generator.din
-		self.viz_gen = viz_gen
-		self.viz_disc = viz_disc
-		self.viz_samples = viz_samples
+		self._viz_settings = set()
+		if viz_samples:
+			self._viz_settings.add('samples')
+		if viz_gen:
+			self._viz_settings.add('gen')
+		if viz_disc:
+			self._viz_settings.add('disc')
 		self.retain_graph = retain_graph
 		
-		self.stats.new('disc-real', 'disc-fake', 'gen-loss')
+		self.register_stats('disc-real', 'disc-fake', 'gen-loss')
 		
 		self.register_attr('total_gen_steps', 0)
 		self.register_attr('total_disc_steps', 0)
@@ -112,86 +114,23 @@ class WGAN(fd.Generative, fd.Decodable, fd.Full_Model):
 			prior = self.sample_prior(N)
 		return self.decode(prior)
 	
-	def _evaluate(self, loader, logger=None, A=None, run=None):
-		
-		inline = A.pull('inline', False)
-		
-		results = {}
-		
-		device = A.pull('device', 'cpu')
-		
-		# region Default output
-		
-		self.stats.reset()
-		batches = iter(loader)
-		total = 0
-		
-		batch = next(batches)
-		batch = util.to(batch, device)
-		total += batch.size(0)
-		
-		with torch.no_grad():
-			out = self.test(batch)
-		
-		if isinstance(self, fd.Visualizable):
-			self.visualize(out, logger)
-		
-		results['out'] = out
-		
-		for batch in loader:  # complete loader for stats
-			batch = util.to(batch, device)
-			total += batch.size(0)
-			with torch.no_grad():
-				self.test(batch)
-		
-		results['stats'] = self.stats.export()
-		display = self.stats.avgs()  # if smooths else stats.avgs()
-		for k, v in display.items():
-			logger.add('scalar', k, v)
-		results['stats_num'] = total
-		
-		# endregion
-		
-		return results
 	
-	def _visualize(self, info, logger):
+	def _visualize(self, info, records):
 		
-		if self.viz_gen and isinstance(self.generator, fd.Visualizable):
-			self.generator.visualize(info, logger)
-		if self.viz_disc and isinstance(self.discriminator, fd.Visualizable):
-			self.discriminator.visualize(info, logger)
+		settings = self._viz_settings
+		if 'gen' in settings and isinstance(self.generator, fd.Visualizable):
+			self.generator.visualize(info, records)
+		if 'disc' in settings and isinstance(self.discriminator, fd.Visualizable):
+			self.discriminator.visualize(info, records)
 		
-		if self.viz_samples:
-		
+		if 'samples' in settings:
 			N = 16
 			
 			real = info.real[:N // 2]
-			logger.add('images', 'real-img', util.image_size_limiter(real))
+			records.log('images', 'real-img', util.image_size_limiter(real))
 			
 			gen = info.gen[:N]
-			logger.add('images', 'gen-img', util.image_size_limiter(gen))
-		
-		logger.flush()
-	
-	def _process_batch(self, batch, out=None):
-		
-		if out is None:
-			out = util.TensorDict()
-		
-		out.batch = batch
-		
-		if isinstance(batch, torch.Tensor):
-			real = batch
-		elif isinstance(batch, (tuple, list)):
-			real = batch[0]
-		elif isinstance(batch, dict):
-			real = batch['x']
-		else:
-			raise NotImplementedError
-		
-		out.real = real
-		
-		return out
+			records.log('images', 'gen-img', util.image_size_limiter(gen))
 	
 	def _step(self, batch, out=None):
 		
@@ -228,8 +167,8 @@ class WGAN(fd.Generative, fd.Decodable, fd.Full_Model):
 		verdict_real = self.discriminator(real)
 		verdict_fake = self.discriminator(fake)
 		
-		self.stats.update('disc-real', verdict_real.mean())
-		self.stats.update('disc-fake', verdict_fake.mean())
+		self.mete('disc-real', verdict_real.mean())
+		self.mete('disc-fake', verdict_fake.mean())
 		
 		out.vreal = verdict_real
 		out.vfake = verdict_fake
@@ -279,7 +218,7 @@ class WGAN(fd.Generative, fd.Decodable, fd.Full_Model):
 		gen_score = self._verdict_metric(out.vgen)
 		out.gen_raw_loss = gen_score
 
-		self.stats.update('gen-loss', gen_score)
+		self.mete('gen-loss', gen_score)
 		
 		return gen_score
 	
@@ -303,6 +242,7 @@ class Clamped(WGAN):
 		super().__init__(A, **kwargs)
 		
 		self.clip_value = clip_value
+		self.register_hparam('clip_value', clip_value)
 
 	def _disc_step(self, out):
 		super()._disc_step(out)
@@ -323,6 +263,7 @@ class Skip(WGAN):
 		super().__init__(A, **kwargs)
 
 		self.disc_step_interval = disc_steps
+		self.register_hparam('disc_step_interval', disc_steps)
 
 	def _take_gen_step(self):
 		return self.disc_step_interval is None \

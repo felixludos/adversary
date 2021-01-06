@@ -23,13 +23,15 @@ def weights_init_normal(m):
 
 
 @fig.Component('dcgan-gen')
-class Generator(fd.Trainable_Model):
-	def __init__(self, A):
+class Generator(fd.Model):
+	def __init__(self, A, latent_dim=None, dout=None, **kwargs):
 		
-		latent_dim = A.pull('latent_dim', '<>din', 100)
-		dout = A.pull('dout')
+		if latent_dim is None:
+			latent_dim = A.pull('latent_dim', '<>din', 100)
+		if dout is None:
+			dout = A.pull('dout')
 		
-		super().__init__(latent_dim, dout)
+		super().__init__(A, din=latent_dim, dout=dout, **kwargs)
 
 		C, H, W = dout
 
@@ -59,12 +61,15 @@ class Generator(fd.Trainable_Model):
 		return img
 
 @fig.Component('dcgan-disc')
-class Discriminator(fd.Trainable_Model):
-	def __init__(self, A):
+class Discriminator(fd.Model):
+	def __init__(self, A, din=None, dout=None, **kwargs):
 		
-		din = A.pull('din')
+		if din is None:
+			din = A.pull('din')
+		if dout is None:
+			dout = 1
 		
-		super().__init__(din, 1)
+		super().__init__(A, din=din, dout=dout, **kwargs)
 		
 		C, H, W = din
 

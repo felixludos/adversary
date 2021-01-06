@@ -3,7 +3,7 @@ parents: [base]
 
 latent_dim: 100
 
-training.epochs: 200
+epochs: 200
 
 dataset.batch_size: 64
 

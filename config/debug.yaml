@@ -6,16 +6,13 @@ parents: [default/wgan-gp]
 
 #model._model_type: gan
 
-
-
-
-
-###
-
-
 name: test-pycharm
 
-output.log_freq: 50
+records.freq: 50
+viz.freq: 100
 
-output.viz_freq: 100
 inline: True
+
+#model.generator.optim.lr: 0.0001
+
+

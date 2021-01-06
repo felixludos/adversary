@@ -45,11 +45,13 @@ class ResidualBlock(fd.Model):
         return x + self.block(x)
 
 @fig.Component('cyclegan-gen')
-class GeneratorResNet(fd.Trainable_Model):
-    def __init__(self, A):
+class GeneratorResNet(fd.Optimizable):
+    def __init__(self, A, din=None, dout=None, **kwargs):
         
-        din = A.pull('input_shape', '<>din')
-        dout = A.pull('output_shape', '<>dout')
+        if din is None:
+            din = A.pull('input_shape', '<>din')
+        if dout is None:
+            dout = A.pull('output_shape', '<>dout')
 
         num_residual_blocks = A.pull('num-res-blocks', 0)
 
@@ -98,7 +100,7 @@ class GeneratorResNet(fd.Trainable_Model):
 
         dout = (out_channels, *din[1:])
 
-        super().__init__(din, dout)
+        super().__init__(A, din=din, dout=dout, **kwargs)
 
         self.model = nn.Sequential(*model)
 
@@ -111,17 +113,19 @@ class GeneratorResNet(fd.Trainable_Model):
 ##############################
 
 @fig.Component('cyclegan-disc')
-class Discriminator(fd.Trainable_Model):
-    def __init__(self, A):
+class Discriminator(fd.Model):
+    def __init__(self, A, din=None, dout=None, **kwargs):
         
-        din = A.pull('input_shape', '<>din')
+        if din is None:
+            din = A.pull('input_shape', '<>din')
 
         channels, height, width = din
 
         # Calculate output shape of image discriminator (PatchGAN)
-        dout = (1, height // 2 ** 4, width // 2 ** 4)
+        if dout is None:
+            dout = (1, height // 2 ** 4, width // 2 ** 4)
         
-        super().__init__(din, dout)
+        super().__init__(A, din=din, dout=dout, **kwargs)
 
         def discriminator_block(in_filters, out_filters, normalize=True):
             """Returns downsampling layers of each discriminator block"""

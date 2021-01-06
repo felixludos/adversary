@@ -15,11 +15,14 @@ from .models import weights_init_normal
 
 
 @fig.Component('cycle-gan')
-class CycleGAN(fd.Full_Model):
+class CycleGAN(fd.Model):
 	
-	def __init__(self, A):
+	def __init__(self, A, din=None, dout=None, **kwargs):
 	
-		din, dout = A.pull('din', silent=True), A.pull('dout', silent=True)
+		if din is None:
+			din = A.pull('din', silent=True)
+		if dout is None:
+			dout = A.pull('dout', silent=True)
 		
 		A.push('gen-AB.din', din, silent=True)
 		A.push('gen-AB.dout', dout, silent=True)
@@ -57,7 +60,7 @@ class CycleGAN(fd.Full_Model):
 		buffer_A = A.pull('buffer-A', None)
 		buffer_B = A.pull('buffer-B', None)
 		
-		super().__init__(din, dout)
+		super().__init__(A, din=din, dout=dout, **kwargs)
 		
 		if cycle_wt is None:
 			print('WARNING: not using cycle loss')
@@ -91,7 +94,7 @@ class CycleGAN(fd.Full_Model):
 		self.criterion_cycle = criterion_cycle
 		self.criterion_identity = criterion_identity
 		
-	def _visualize(self, info, logger):
+	def _visualize(self, info, records):
 		
 		N = 8
 		
@@ -99,22 +102,22 @@ class CycleGAN(fd.Full_Model):
 		# logger.add('images', 'real-img', util.image_size_limiter(real))
 
 		real_A = info.real_A[:N]
-		logger.add('images', 'real-img-A', util.image_size_limiter(real_A))
+		records.log('images', 'real-img-A', util.image_size_limiter(real_A))
 
 		real_B = info.real_B[:N]
-		logger.add('images', 'real-img-B', util.image_size_limiter(real_B))
+		records.log('images', 'real-img-B', util.image_size_limiter(real_B))
 		
 		gen_A = info.fake_A[:N * 2]
-		logger.add('images', 'gen-img-A', util.image_size_limiter(gen_A))
+		records.log('images', 'gen-img-A', util.image_size_limiter(gen_A))
 		
 		gen_B = info.fake_B[:N * 2]
-		logger.add('images', 'gen-img-B', util.image_size_limiter(gen_B))
+		records.log('images', 'gen-img-B', util.image_size_limiter(gen_B))
 		
 		rec_A = info.recov_A[:N * 2]
-		logger.add('images', 'rec-img-A', util.image_size_limiter(rec_A))
+		records.log('images', 'rec-img-A', util.image_size_limiter(rec_A))
 		
 		rec_B = info.recov_B[:N * 2]
-		logger.add('images', 'rec-img-B', util.image_size_limiter(rec_B))
+		records.log('images', 'rec-img-B', util.image_size_limiter(rec_B))
 	
 	def _process_batch(self, batch, out=None):
 		

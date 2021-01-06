@@ -3,10 +3,10 @@ import sys, os
 
 import torch
 
-from foundation import Full_Model
+from foundation import Model, Generative
 from foundation import util
 
-class GAN_Like(Full_Model):
+class GAN_Like(Generative, Model):
 	
 	def _process_batch(self, batch, out=None):
 

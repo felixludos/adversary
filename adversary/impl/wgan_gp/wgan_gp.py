@@ -64,10 +64,11 @@ class GradPenalty(WGAN):
 		super().__init__(config, **kwargs)
 
 		self.gp_wt = gp_wt
+		self.register_hparam('gp-wt', gp_wt)
 
 		self.gp_fn = grad_penalty_sj if isinstance(self, ShannonJensen_GAN) else grad_penalty
 
-		self.stats.new('grad-penalty')
+		self.register_stats('grad-penalty')
 
 	def _grad_penalty(self, out):
 		return self.gp_fn(self.discriminator, out.real, out.fake)
@@ -77,7 +78,7 @@ class GradPenalty(WGAN):
 
 		if self.gp_wt is not None and self.gp_wt > 0:
 			grad_penalty = self._grad_penalty(out)
-			self.stats.update('grad-penalty', grad_penalty)
+			self.mete('grad-penalty', grad_penalty)
 			loss += self.gp_wt * grad_penalty
 
 		return loss
