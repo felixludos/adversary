@@ -247,8 +247,9 @@ class Clamped(WGAN):
 	def _disc_step(self, out):
 		super()._disc_step(out)
 		
-		for p in self.discriminator.parameters():
-			p.data.clamp_(-self.clip_value, self.clip_value)
+		if self.clip_value is not None:
+			for p in self.discriminator.parameters():
+				p.data.clamp_(-self.clip_value, self.clip_value)
 
 
 @fig.AutoModifier('skip-gen')

@@ -1,6 +1,6 @@
 _meta.script_name: train
 
-parents: [default/wgan-gp]
+parents: [default/dcgan]
 #parents: [translation/cifar, default/cycle-gan]
 
 
