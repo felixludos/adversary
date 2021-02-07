@@ -7,9 +7,7 @@ from torch.nn import functional as F
 
 import omnifig as fig
 
-import foundation as fd
-from foundation import models
-from foundation import util
+import omnilearn as learn
 
 def weights_init_normal(m):
     classname = m.__class__.__name__
@@ -27,7 +25,7 @@ def weights_init_normal(m):
 ##############################
 
 
-class ResidualBlock(fd.Model):
+class ResidualBlock(learn.Model):
     def __init__(self, in_features):
         super().__init__(in_features, in_features)
 
@@ -45,7 +43,7 @@ class ResidualBlock(fd.Model):
         return x + self.block(x)
 
 @fig.Component('cyclegan-gen')
-class GeneratorResNet(fd.Optimizable):
+class GeneratorResNet(learn.Optimizable):
     def __init__(self, A, din=None, dout=None, **kwargs):
         
         if din is None:
@@ -113,7 +111,7 @@ class GeneratorResNet(fd.Optimizable):
 ##############################
 
 @fig.Component('cyclegan-disc')
-class Discriminator(fd.Model):
+class Discriminator(learn.Model):
     def __init__(self, A, din=None, dout=None, **kwargs):
         
         if din is None:

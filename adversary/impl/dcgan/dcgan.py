@@ -5,9 +5,9 @@ from torch.nn import functional as F
 
 import omnifig as fig
 
-import foundation as fd
-from foundation import models
-from foundation import util
+import omnilearn as learn
+from omnilearn import models
+from omnilearn import util
 
 from ..wgan import WGAN
 from ... import misc
@@ -23,7 +23,7 @@ def weights_init_normal(m):
 
 
 @fig.Component('dcgan-gen')
-class Generator(fd.Model):
+class Generator(learn.Model):
 	def __init__(self, A, latent_dim=None, dout=None, **kwargs):
 		
 		if latent_dim is None:
@@ -61,7 +61,7 @@ class Generator(fd.Model):
 		return img
 
 @fig.Component('dcgan-disc')
-class Discriminator(fd.Model):
+class Discriminator(learn.Model):
 	def __init__(self, A, din=None, dout=None, **kwargs):
 		
 		if din is None:

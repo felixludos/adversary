@@ -3,8 +3,8 @@ import sys, os
 
 import torch
 
-from foundation import Model, Generative
-from foundation import util
+from omnilearn import Model, Generative
+from omnilearn import util
 
 class GAN_Like(Generative, Model):
 	

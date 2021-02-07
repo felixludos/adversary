@@ -7,15 +7,15 @@ from torch import autograd
 
 import omnifig as fig
 
-import foundation as fd
-from foundation import models
-from foundation import util
+import omnilearn as learn
+from omnilearn import models
+from omnilearn import util
 
 from .models import weights_init_normal
 
 
 @fig.Component('cycle-gan')
-class CycleGAN(fd.Model):
+class CycleGAN(learn.Model):
 	
 	def __init__(self, A, din=None, dout=None, **kwargs):
 	

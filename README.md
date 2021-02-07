@@ -1,5 +1,5 @@
 # adversary
-Pytorch GAN implementations using foundation and omni-fig
+Pytorch GAN implementations using [omni-learn](https://github.com/felixludos/omni-learn) and [omni-fig](https://github.com/felixludos/omni-fig).
 
 ## Resources
 

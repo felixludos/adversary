@@ -6,13 +6,13 @@ from torch import nn
 
 import omnifig as fig
 
-import foundation as fd
-from foundation import util
+import omnilearn as learn
+from omnilearn import util
 
 from ...misc import GAN_Like
 
 @fig.Component('wgan-gen')
-class Generator(fd.Optimizable):
+class Generator(learn.Optimizable):
 	def __init__(self, A, **kwargs):
 		
 		latent_dim = A.pull('latent_dim', 100)
@@ -43,7 +43,7 @@ class Generator(fd.Optimizable):
 
 
 @fig.Component('wgan-disc')
-class Discriminator(fd.Optimizable):
+class Discriminator(learn.Optimizable):
 	def __init__(self, A, din=None, dout=None, **kwargs):
 		
 		if din is None:
@@ -69,7 +69,7 @@ class Discriminator(fd.Optimizable):
 
 
 @fig.Component('wgan')
-class WGAN(fd.Decodable, GAN_Like):
+class WGAN(learn.Decodable, GAN_Like):
 	def __init__(self, config, generator=None, discriminator=None, **other):
 		
 		if generator is None:
@@ -118,9 +118,9 @@ class WGAN(fd.Decodable, GAN_Like):
 	def _visualize(self, info, records):
 		
 		settings = self._viz_settings
-		if 'gen' in settings and isinstance(self.generator, fd.Visualizable):
+		if 'gen' in settings and isinstance(self.generator, learn.Visualizable):
 			self.generator.visualize(info, records)
-		if 'disc' in settings and isinstance(self.discriminator, fd.Visualizable):
+		if 'disc' in settings and isinstance(self.discriminator, learn.Visualizable):
 			self.discriminator.visualize(info, records)
 		
 		if 'samples' in settings:
